@@ -58,16 +58,16 @@ export class AuthService {
     try {
       const hash = bcrypt.hashSync(data.password, 10);
       await this.prisma.user.create({
-        data: { ...data, password: hash, status: UserStatus.PENDING },
+        data: { ...data, password: hash, status: UserStatus.ACTIVE },
       });
 
-      const otp = totp.generate(data.email + 'apex');
-      await this.mailService.sendMail(
-        data.email,
-        '🔐 Your OTP Code',
-        this.generateOtpHtml(`${otp}`),
-      );
-      return { message: 'Verification code sent to your email' };
+      // const otp = totp.generate(data.email + 'apex');
+      // await this.mailService.sendMail(
+      //   data.email,
+      //   '🔐 Your OTP Code',
+      //   this.generateOtpHtml(`${otp}`),
+      // );
+      return { message: 'Registered' };
     } catch (error) {
       if (error != InternalServerErrorException) {
         throw error;
@@ -76,57 +76,57 @@ export class AuthService {
     }
   }
 
-  async verify(data: VerifyAuthDto) {
-    try {
-      const user = await this.findUser(data.email);
-      if (!user) {
-        throw new NotFoundException({ message: 'User not found' });
-      }
-      const match = totp.verify({
-        token: data.otp,
-        secret: data.email + 'apex',
-      });
-      if (!match) {
-        throw new BadRequestException({ message: 'Wrong credentials' });
-      }
-      await this.prisma.user.update({
-        where: { email: data.email },
-        data: { status: UserStatus.ACTIVE },
-      });
-      return { message: 'Verified' };
-    } catch (err) {
-      if (err != InternalServerErrorException) {
-        throw err;
-      }
-      console.log(err);
-    }
-  }
+  // async verify(data: VerifyAuthDto) {
+  //   try {
+  //     const user = await this.findUser(data.email);
+  //     if (!user) {
+  //       throw new NotFoundException({ message: 'User not found' });
+  //     }
+  //     const match = totp.verify({
+  //       token: data.otp,
+  //       secret: data.email + 'apex',
+  //     });
+  //     if (!match) {
+  //       throw new BadRequestException({ message: 'Wrong credentials' });
+  //     }
+  //     await this.prisma.user.update({
+  //       where: { email: data.email },
+  //       data: { status: UserStatus.ACTIVE },
+  //     });
+  //     return { message: 'Verified' };
+  //   } catch (err) {
+  //     if (err != InternalServerErrorException) {
+  //       throw err;
+  //     }
+  //     console.log(err);
+  //   }
+  // }
 
-  async resendOtp(dto: ResendOtpAuthDto) {
-    try {
-      const user = await this.findUser(dto.email);
-      if (!user) {
-        throw new NotFoundException({ message: 'User not found' });
-      }
+  // async resendOtp(dto: ResendOtpAuthDto) {
+  //   try {
+  //     const user = await this.findUser(dto.email);
+  //     if (!user) {
+  //       throw new NotFoundException({ message: 'User not found' });
+  //     }
 
-      const otp = totp.generate(dto.email + 'apex');
-      await this.mailService.sendMail(
-        dto.email,
-        '🔐 Your OTP Code',
-        this.generateOtpHtml(`${otp}`),
-      );
+  //     const otp = totp.generate(dto.email + 'apex');
+  //     await this.mailService.sendMail(
+  //       dto.email,
+  //       '🔐 Your OTP Code',
+  //       this.generateOtpHtml(`${otp}`),
+  //     );
 
-      return { message: 'Verification code sent to your email' };
-    } catch (error) {
-      if (error != InternalServerErrorException) {
-        throw error;
-      }
-      console.log(error);
-      throw new InternalServerErrorException({
-        message: 'Something went wrong',
-      });
-    }
-  }
+  //     return { message: 'Verification code sent to your email' };
+  //   } catch (error) {
+  //     if (error != InternalServerErrorException) {
+  //       throw error;
+  //     }
+  //     console.log(error);
+  //     throw new InternalServerErrorException({
+  //       message: 'Something went wrong',
+  //     });
+  //   }
+  // }
 
   async login(data: CreateAuthDto) {
     const user = await this.findUser(data.email);

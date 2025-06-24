@@ -5,10 +5,10 @@ export declare class StoreController {
     private readonly storeService;
     constructor(storeService: StoreService);
     buy(req: Request, dto: BuyVideoCardDto): Promise<{
-        id: string;
         type: import(".prisma/client").$Enums.VideoCardType;
-        userId: string;
+        id: string;
         createdAt: Date;
+        userId: string;
     }>;
     getAll(): {
         hashRate: number;

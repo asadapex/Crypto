@@ -4,9 +4,9 @@ export declare class StoreService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     buyCard(userId: string, dto: BuyVideoCardDto): Promise<{
-        id: string;
         type: import(".prisma/client").$Enums.VideoCardType;
-        userId: string;
+        id: string;
         createdAt: Date;
+        userId: string;
     }>;
 }

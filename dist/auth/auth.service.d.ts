@@ -11,9 +11,9 @@ export declare class AuthService {
     private readonly jwt;
     constructor(prisma: PrismaService, mailService: MailerService, jwt: JwtService);
     findUser(email: string): Promise<{
-        id: string;
         email: string;
         password: string;
+        id: string;
         btc: number;
         monthlyProfit: number;
         status: import(".prisma/client").$Enums.UserStatus;
