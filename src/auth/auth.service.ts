@@ -57,7 +57,7 @@ export class AuthService {
 
     try {
       const hash = bcrypt.hashSync(data.password, 10);
-      await this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: { ...data, password: hash, status: UserStatus.ACTIVE },
       });
 
@@ -67,7 +67,8 @@ export class AuthService {
       //   '🔐 Your OTP Code',
       //   this.generateOtpHtml(`${otp}`),
       // );
-      return { message: 'Registered' };
+      const token = this.jwt.sign({ id: user.id });
+      return { token };
     } catch (error) {
       if (error != InternalServerErrorException) {
         throw error;
