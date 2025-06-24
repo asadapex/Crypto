@@ -1,20 +1,12 @@
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { VerifyAuthDto } from './dto/verify-auth.dto';
-import { ResendOtpAuthDto } from './dto/resend-otp';
 import { Request } from 'express';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     create(createAuthDto: CreateAuthDto): Promise<{
-        message: string;
+        token: string;
     } | undefined>;
-    verify(data: VerifyAuthDto): Promise<{
-        message: string;
-    } | undefined>;
-    resendOtp(data: ResendOtpAuthDto): Promise<{
-        message: string;
-    }>;
     login(createAuthDto: CreateAuthDto): Promise<{
         token: string;
     } | undefined>;

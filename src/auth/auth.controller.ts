@@ -25,15 +25,15 @@ export class AuthController {
     return this.authService.create(createAuthDto);
   }
 
-  @Post('verify')
-  verify(@Body() data: VerifyAuthDto) {
-    return this.authService.verify(data);
-  }
+  // @Post('verify')
+  // verify(@Body() data: VerifyAuthDto) {
+  //   return this.authService.verify(data);
+  // }
 
-  @Post('resend-otp')
-  resendOtp(@Body() data: ResendOtpAuthDto) {
-    return this.authService.resendOtp(data);
-  }
+  // @Post('resend-otp')
+  // resendOtp(@Body() data: ResendOtpAuthDto) {
+  //   return this.authService.resendOtp(data);
+  // }
 
   @Post('login')
   login(@Body() createAuthDto: CreateAuthDto) {

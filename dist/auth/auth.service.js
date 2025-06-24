@@ -14,7 +14,6 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
 const otplib_1 = require("otplib");
-const mailer_service_1 = require("../mailer/mailer.service");
 const client_1 = require("@prisma/client");
 const jwt_1 = require("@nestjs/jwt");
 otplib_1.totp.options = {
@@ -23,31 +22,14 @@ otplib_1.totp.options = {
 };
 let AuthService = class AuthService {
     prisma;
-    mailService;
     jwt;
-    constructor(prisma, mailService, jwt) {
+    constructor(prisma, jwt) {
         this.prisma = prisma;
-        this.mailService = mailService;
         this.jwt = jwt;
     }
     async findUser(email) {
         const user = await this.prisma.user.findUnique({ where: { email } });
         return user;
-    }
-    generateOtpHtml(code) {
-        return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-      <h2 style="color: #4CAF50; text-align: center;">🔐 Service</h2>
-      <p style="font-size: 16px;">Assalomu alaykum,</p>
-      <p style="font-size: 16px;">Sizning bir martalik parolingiz (OTP):</p>
-      <div style="font-size: 30px; font-weight: bold; color: #333; text-align: center; margin: 20px 0;">
-        ${code}
-      </div>
-      <p style="font-size: 14px; color: #555;">Kod 2 daqiqa davomida amal qiladi. Kodni hech kim bilan bo'lishmang.</p>
-      <hr />
-      <p style="font-size: 12px; color: #999;">Agar bu xabar siz kutmagan bo‘lsangiz, iltimos, e'tiborsiz qoldiring.</p>
-    </div>
-    `;
     }
     async create(data) {
         const user = await this.findUser(data.email);
@@ -56,64 +38,17 @@ let AuthService = class AuthService {
         }
         try {
             const hash = bcrypt.hashSync(data.password, 10);
-            await this.prisma.user.create({
-                data: { ...data, password: hash, status: client_1.UserStatus.PENDING },
+            const user = await this.prisma.user.create({
+                data: { ...data, password: hash, status: client_1.UserStatus.ACTIVE },
             });
-            const otp = otplib_1.totp.generate(data.email + 'apex');
-            await this.mailService.sendMail(data.email, '🔐 Your OTP Code', this.generateOtpHtml(`${otp}`));
-            return { message: 'Verification code sent to your email' };
+            const token = this.jwt.sign({ id: user.id });
+            return { token };
         }
         catch (error) {
             if (error != common_1.InternalServerErrorException) {
                 throw error;
             }
             console.log(error);
-        }
-    }
-    async verify(data) {
-        try {
-            const user = await this.findUser(data.email);
-            if (!user) {
-                throw new common_1.NotFoundException({ message: 'User not found' });
-            }
-            const match = otplib_1.totp.verify({
-                token: data.otp,
-                secret: data.email + 'apex',
-            });
-            if (!match) {
-                throw new common_1.BadRequestException({ message: 'Wrong credentials' });
-            }
-            await this.prisma.user.update({
-                where: { email: data.email },
-                data: { status: client_1.UserStatus.ACTIVE },
-            });
-            return { message: 'Verified' };
-        }
-        catch (err) {
-            if (err != common_1.InternalServerErrorException) {
-                throw err;
-            }
-            console.log(err);
-        }
-    }
-    async resendOtp(dto) {
-        try {
-            const user = await this.findUser(dto.email);
-            if (!user) {
-                throw new common_1.NotFoundException({ message: 'User not found' });
-            }
-            const otp = otplib_1.totp.generate(dto.email + 'apex');
-            await this.mailService.sendMail(dto.email, '🔐 Your OTP Code', this.generateOtpHtml(`${otp}`));
-            return { message: 'Verification code sent to your email' };
-        }
-        catch (error) {
-            if (error != common_1.InternalServerErrorException) {
-                throw error;
-            }
-            console.log(error);
-            throw new common_1.InternalServerErrorException({
-                message: 'Something went wrong',
-            });
         }
     }
     async login(data) {
@@ -163,7 +98,6 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        mailer_service_1.MailerService,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map
