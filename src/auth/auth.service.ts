@@ -33,21 +33,21 @@ export class AuthService {
     return user;
   }
 
-  generateOtpHtml(code: string): string {
-    return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-      <h2 style="color: #4CAF50; text-align: center;">🔐 Service</h2>
-      <p style="font-size: 16px;">Assalomu alaykum,</p>
-      <p style="font-size: 16px;">Sizning bir martalik parolingiz (OTP):</p>
-      <div style="font-size: 30px; font-weight: bold; color: #333; text-align: center; margin: 20px 0;">
-        ${code}
-      </div>
-      <p style="font-size: 14px; color: #555;">Kod 2 daqiqa davomida amal qiladi. Kodni hech kim bilan bo'lishmang.</p>
-      <hr />
-      <p style="font-size: 12px; color: #999;">Agar bu xabar siz kutmagan bo‘lsangiz, iltimos, e'tiborsiz qoldiring.</p>
-    </div>
-    `;
-  }
+  // generateOtpHtml(code: string): string {
+  //   return `
+  //   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+  //     <h2 style="color: #4CAF50; text-align: center;">🔐 Service</h2>
+  //     <p style="font-size: 16px;">Assalomu alaykum,</p>
+  //     <p style="font-size: 16px;">Sizning bir martalik parolingiz (OTP):</p>
+  //     <div style="font-size: 30px; font-weight: bold; color: #333; text-align: center; margin: 20px 0;">
+  //       ${code}
+  //     </div>
+  //     <p style="font-size: 14px; color: #555;">Kod 2 daqiqa davomida amal qiladi. Kodni hech kim bilan bo'lishmang.</p>
+  //     <hr />
+  //     <p style="font-size: 12px; color: #999;">Agar bu xabar siz kutmagan bo‘lsangiz, iltimos, e'tiborsiz qoldiring.</p>
+  //   </div>
+  //   `;
+  // }
 
   async create(data: CreateAuthDto) {
     const user = await this.findUser(data.email);
