@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VideoCardType {
+  GTX_1660
+  RTX_3060
+  RTX_3080
+  RTX_4090
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+}
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  password      String
+  cards         UserVideoCard[]
+  btc           Float           @default(0)
+  monthlyProfit Float           @default(0)
+  status        UserStatus
+  createdAt     DateTime        @default(now())
+}
+
+model UserVideoCard {
+  id        String        @id @default(uuid())
+  type      VideoCardType
+  user      User          @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime      @default(now())
+}
