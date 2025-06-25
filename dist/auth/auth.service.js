@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
 const otplib_1 = require("otplib");
+const mailer_service_1 = require("../mailer/mailer.service");
 const client_1 = require("@prisma/client");
 const jwt_1 = require("@nestjs/jwt");
 otplib_1.totp.options = {
@@ -22,9 +23,11 @@ otplib_1.totp.options = {
 };
 let AuthService = class AuthService {
     prisma;
+    mailService;
     jwt;
-    constructor(prisma, jwt) {
+    constructor(prisma, mailService, jwt) {
         this.prisma = prisma;
+        this.mailService = mailService;
         this.jwt = jwt;
     }
     async findUser(email) {
@@ -98,6 +101,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        mailer_service_1.MailerService,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

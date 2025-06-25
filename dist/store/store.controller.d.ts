@@ -4,15 +4,12 @@ import { Request } from 'express';
 export declare class StoreController {
     private readonly storeService;
     constructor(storeService: StoreService);
-    buy(req: Request, dto: BuyVideoCardDto): Promise<{
-        type: import(".prisma/client").$Enums.VideoCardType;
-        id: string;
-        createdAt: Date;
-        userId: string;
+    buy(req: Request, dtos: BuyVideoCardDto[]): Promise<{
+        message: string;
     }>;
-    getAll(): {
+    getCards(): Promise<{
         hashRate: number;
         price: number;
         type: string;
-    }[];
+    }[]>;
 }

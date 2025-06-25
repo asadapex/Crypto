@@ -1,11 +1,13 @@
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { MailerService } from 'src/mailer/mailer.service';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 export declare class AuthService {
     private readonly prisma;
+    private readonly mailService;
     private readonly jwt;
-    constructor(prisma: PrismaService, jwt: JwtService);
+    constructor(prisma: PrismaService, mailService: MailerService, jwt: JwtService);
     findUser(email: string): Promise<{
         email: string;
         password: string;

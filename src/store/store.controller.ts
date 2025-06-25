@@ -1,9 +1,9 @@
-import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
+import { Post, Body, UseGuards, Controller, Req, Get } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { BuyVideoCardDto } from './dto/buy-video-card.dto';
 import { AuthGuard } from 'src/jwtauth/jwtauth.guard';
-import { VideoCardInfo } from 'src/VideoCards/VideoCardInfo';
 import { Request } from 'express';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('store')
 export class StoreController {
@@ -11,16 +11,14 @@ export class StoreController {
 
   @UseGuards(AuthGuard)
   @Post('buy')
-  async buy(@Req() req: Request, @Body() dto: BuyVideoCardDto) {
+  @ApiBody({ type: [BuyVideoCardDto] })
+  async buy(@Req() req: Request, @Body() dtos: BuyVideoCardDto[]) {
     const userId = req['user-id'];
-    return this.storeService.buyCard(userId, dto);
+    return this.storeService.buyCards(userId, dtos);
   }
 
-  @Get('vide-cards')
-  getAll() {
-    return Object.entries(VideoCardInfo).map(([type, info]) => ({
-      type,
-      ...info,
-    }));
+  @Get('cards')
+  async getCards() {
+    return this.storeService.getAllVideoCards();
   }
 }

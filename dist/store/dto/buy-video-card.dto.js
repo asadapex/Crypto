@@ -15,6 +15,7 @@ const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
 class BuyVideoCardDto {
     type;
+    count;
 }
 exports.BuyVideoCardDto = BuyVideoCardDto;
 __decorate([
@@ -22,4 +23,10 @@ __decorate([
     (0, class_validator_1.IsEnum)(client_1.VideoCardType),
     __metadata("design:type", String)
 ], BuyVideoCardDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, example: 1 }),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    __metadata("design:type", Number)
+], BuyVideoCardDto.prototype, "count", void 0);
 //# sourceMappingURL=buy-video-card.dto.js.map

@@ -17,39 +17,37 @@ const common_1 = require("@nestjs/common");
 const store_service_1 = require("./store.service");
 const buy_video_card_dto_1 = require("./dto/buy-video-card.dto");
 const jwtauth_guard_1 = require("../jwtauth/jwtauth.guard");
-const VideoCardInfo_1 = require("../VideoCards/VideoCardInfo");
+const swagger_1 = require("@nestjs/swagger");
 let StoreController = class StoreController {
     storeService;
     constructor(storeService) {
         this.storeService = storeService;
     }
-    async buy(req, dto) {
+    async buy(req, dtos) {
         const userId = req['user-id'];
-        return this.storeService.buyCard(userId, dto);
+        return this.storeService.buyCards(userId, dtos);
     }
-    getAll() {
-        return Object.entries(VideoCardInfo_1.VideoCardInfo).map(([type, info]) => ({
-            type,
-            ...info,
-        }));
+    async getCards() {
+        return this.storeService.getAllVideoCards();
     }
 };
 exports.StoreController = StoreController;
 __decorate([
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Post)('buy'),
+    (0, swagger_1.ApiBody)({ type: [buy_video_card_dto_1.BuyVideoCardDto] }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, buy_video_card_dto_1.BuyVideoCardDto]),
+    __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "buy", null);
 __decorate([
-    (0, common_1.Get)('vide-cards'),
+    (0, common_1.Get)('cards'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], StoreController.prototype, "getAll", null);
+    __metadata("design:returntype", Promise)
+], StoreController.prototype, "getCards", null);
 exports.StoreController = StoreController = __decorate([
     (0, common_1.Controller)('store'),
     __metadata("design:paramtypes", [store_service_1.StoreService])

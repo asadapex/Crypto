@@ -13,22 +13,33 @@ exports.StoreService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const client_1 = require("@prisma/client");
+const VideoCardInfo_1 = require("../VideoCards/VideoCardInfo");
 let StoreService = class StoreService {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async buyCard(userId, dto) {
-        const videoCardExists = Object.values(client_1.VideoCardType).includes(dto.type);
-        if (!videoCardExists) {
-            throw new common_1.NotFoundException({ message: 'Video card not found' });
-        }
-        return this.prisma.userVideoCard.create({
-            data: {
+    async buyCards(userId, dtos) {
+        for (const dto of dtos) {
+            const videoCardExists = Object.values(client_1.VideoCardType).includes(dto.type);
+            if (!videoCardExists) {
+                throw new common_1.NotFoundException(`Video card not found: ${dto.type}`);
+            }
+            const createManyData = Array.from({ length: dto.count }).map(() => ({
                 userId,
                 type: dto.type,
-            },
-        });
+            }));
+            await this.prisma.userVideoCard.createMany({
+                data: createManyData,
+            });
+        }
+        return { message: 'Video cards added' };
+    }
+    async getAllVideoCards() {
+        return Object.entries(VideoCardInfo_1.VideoCardInfo).map(([type, info]) => ({
+            type,
+            ...info,
+        }));
     }
 };
 exports.StoreService = StoreService;
