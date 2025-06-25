@@ -1,0 +1,43 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  SSH_PRIVATE_KEY: $LIGHTSAIL_SSH_KEY
+  HOST: $LIGHTSAIL_HOST
+  USER: $LIGHTSAIL_USER
+
+before_script:
+  - 'which ssh-agent || (apt-get update -y && apt-get install openssh-client -y)'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan $HOST >> ~/.ssh/known_hosts
+
+build:
+  stage: build
+  image: node:20
+  script:
+    - npm install
+    - npx prisma generate
+    - npx prisma migrate dev --name init
+    - npm run build
+  artifacts:
+    paths:
+      - dist
+      - prisma
+      - package.json
+      - ecosystem.config.js
+
+deploy:
+  stage: deploy
+  script:
+    - scp -r dist prisma package.json ecosystem.config.js $USER@$HOST:/home/ubuntu/nestjs-app
+    - ssh $USER@$HOST << EOF
+      cd /home/ubuntu/nestjs-app
+      npm install --omit=dev
+      npx prisma generate
+      npx prisma migrate deploy
+      pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
+      EOF
